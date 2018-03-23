@@ -1,0 +1,41 @@
+{
+  "name": "Boilerplate2018",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/jest --watch",
+    "source-map-explorer-production": "webpack --env.NODE_ENV=production && ./node_modules/.bin/source-map-explorer ./dist/app.bundle.js",
+    "server-dev": "node ./src/server NODE_ENV=development"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "eslint": "^4.18.2",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
+    "jest": "^22.4.2",
+    "source-map-explorer": "^1.5.0",
+    "webpack": "^4.1.1",
+    "webpack-cli": "^2.0.10",
+    "webpack-dev-middleware": "^3.0.1",
+    "webpack-hot-middleware": "^2.21.2"
+  },
+  "dependencies": {
+    "attrs.argv": "^0.2.0-a",
+    "express": "^4.16.2",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0"
+  }
+}
