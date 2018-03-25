@@ -9,5 +9,5 @@ describe('Header (component)', () => {
   it('has at least one <h1> tag', () => {
     const wrapper = shallow(<Header />);
     expect(wrapper.contains(<h1>Header!</h1>)).toBe(true);
-  })
+  });
 });

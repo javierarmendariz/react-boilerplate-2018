@@ -1,12 +1,5 @@
-const concat = (arrayOne, arrayTwo) => (
-  [...arrayOne, ...arrayTwo]
-);
+const concat = (arrayOne, arrayTwo) => [...arrayOne, ...arrayTwo];
 
-const lastElement = array => (
-  array[array.length - 1]
-);
+const lastElement = array => array[array.length - 1];
 
-export {
-  concat,
-  lastElement,
-};
+export { concat, lastElement };

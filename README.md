@@ -73,14 +73,17 @@ npm i webpack webpack-cli --save-dev
 const path = require('path');
 
 module.exports = {
-  entry: './src/client/app.jsx',
+  entry: './src/client/App.jsx',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'app.bundle.js',
   },
+  resolve: {
+    extensions: ['.js', '.jsx'],
+  },
 };
 ```
-Up to this point, we have Webpack 4 ready to bundle JavaScript code! Create the _src/client/app.jsx_ file and put some Vanilla Javascript code, let's say:
+Up to this point, we have Webpack 4 ready to bundle JavaScript code! Create the _src/client/App.jsx_ file and put some Vanilla Javascript code, let's say:
 ```js
 console.log(1234567890);
 ```
@@ -181,7 +184,7 @@ We now have a Web server running on the port 3000. And any file change will trig
   1. Run the Server: node ./src/server
   2. Visit http://localhost:3000/app.bundle.js. You should see the bundle created by Webpack
   3. Look for: console.log(1234567890)
-  4. Update the file ./src/client/app.jsx to console.log(12345678900)
+  4. Update the file ./src/client/App.jsx to console.log(12345678900)
   5. Refresh http://localhost:3000/app.bundle.js
   6. Look for: console.log(12345678900)
 
@@ -209,19 +212,19 @@ plugins: [
 Add a new entry in the webpack.config.js file
 ```js
 entry: [
-  './src/client/app.jsx',
+  './src/client/App.jsx',
   'webpack-hot-middleware/client',
 ]
 ```
 
 ### 24. Webpack to accept updates **module.hot**
-Add this inside the ./src/client/app.jsx file
+Add this inside the ./src/client/App.jsx file
 ```js
 if (module.hot) {
   module.hot.accept();
 }
 ```
-Up to this point any change we do in ./src/client/app.jsx will be automatically reflected in the browser, with no page refresh needed.
+Up to this point any change we do in ./src/client/App.jsx will be automatically reflected in the browser, with no page refresh needed.
 
 ## Development configurations
 ### 25. Webpack **development mode**
@@ -426,3 +429,88 @@ Execute the test script and Enzyme will run over Jest:
 ```
 npm run tests
 ```
+
+## Redux
+### 36. Install **Redux**
+```
+npm i redux --save
+```
+### 37. Install **React Redux**
+```
+npm i react-redux --save
+```
+
+### 38. Create the **index.jsx** in the _client_ directory
+./src/client/index.jsx
+```js
+import React from 'react';
+import reactDOM from 'react-dom';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+
+import App from './App';
+import reducers from './reducers';
+
+if (module.hot) {
+  module.hot.accept();
+}
+
+const store = createStore(
+  reducers,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+);
+
+const AppConfiguration = () => (
+  <Provider store={store}>
+    <App />
+  </Provider>
+);
+
+reactDOM.render(<AppConfiguration />, document.getElementById('root'));
+```
+### 39. **First Reducer**
+Create the following file structure for the reducers configuration:
+```
+|-- src
+    |-- reducers
+    |   |-- index.js
+    |   |-- inventory.js
+```    
+#### 40. Reducer: index.js
+./src/client/reducers/index.js
+```js
+import { combineReducers } from 'redux';
+import inventory from './inventory';
+
+export { inventory };
+
+export default combineReducers({
+  inventory,
+});
+```
+#### 41. Reducer: inventory.js
+./src/client/reducers/inventory.js
+```js
+const inventory = (state = {}) => state;
+
+export default inventory;
+```
+
+### 42. Simplify the App.jsx
+./src/client/App.jsx
+```js
+import React from 'react';
+import Header from './components/header';
+
+const App = () => (
+  <div>
+    <Header />
+  </div>
+);
+
+export default App;
+```
+### 43. **Redux DevTools**
+Install the Chrome Addon [Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd), so you can see the Store state structure. By now we only have the _inventory_ property with an empty object:
+
+![Redux Devtools](./readme/43.redux-devtools.png)
