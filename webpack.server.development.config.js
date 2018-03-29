@@ -1,13 +1,13 @@
 const path = require('path');
 const webpack = require('webpack');
 
-module.exports = env => ({
-  mode: env.NODE_ENV === 'development' ? 'development' : 'production',
-  devtool: env.NODE_ENV === 'development' ? 'cheap-module-eval-source-map' : 'source-map',
+module.exports = {
+  mode: 'development',
+  devtool: 'cheap-module-eval-source-map',
   entry: [path.resolve(__dirname, './src/client/index.jsx'), 'webpack-hot-middleware/client'],
   output: {
-    path: path.resolve(__dirname, './dist'),
-    filename: 'app.bundle.js',
+    path: path.resolve(__dirname, './src/server/static'),
+    filename: 'app.client.bundle.js',
     publicPath: '/',
   },
   module: {
@@ -24,4 +24,4 @@ module.exports = env => ({
   resolve: {
     extensions: ['.js', '.jsx'],
   },
-});
+};

@@ -1,20 +1,9 @@
-var argv = require('attrs.argv');
 const express = require('express');
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
-const config = require('../../webpack.config.js');
-const path = require('path');
+const webpackConfig = require('../../webpack.server.development.config.js');
 
-// CLI Arguments
-const { NODE_ENV } = argv;
-
-// Webpack Configuration Object
-const webpackConfig = config({
-  env: {
-    NODE_ENV,
-  },
-});
 const compiler = webpack(webpackConfig);
 
 const app = express();
@@ -27,10 +16,19 @@ app.use(webpackDevMiddleware(compiler, {
 }));
 app.use(webpackHotMiddleware(compiler));
 
-
-app.use(express.static(path.join(`${__dirname}/static`)));
 app.get('/', (req, res) => {
-  res.sendFile(path.join(`${__dirname}/index.html`));
+  const html = `
+  <html>
+    <head>
+    </head>
+    <body>
+      <div id="root"></div>
+      <script src="http://localhost:3000/app.client.bundle.js"></script>
+    </body>
+  </html>
+
+  `;
+  res.send(html);
 });
 
 app.listen(3000, () => {

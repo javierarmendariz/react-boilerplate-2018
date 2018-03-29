@@ -514,3 +514,204 @@ export default App;
 Install the Chrome Addon [Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd), so you can see the Store state structure. By now we only have the _inventory_ property with an empty object:
 
 ![Redux Devtools](./readme/43.redux-devtools.png)
+
+## Server Side Rendering
+We will organize a little bit our scripts and configurations, such way we have the _Development_ and _Configuration_ settings separated.
+Basically the Server Side Rendering magic happens in the _Production Server_ file.
+
+### 44. **Development Server**
+src/server/index.development.js
+```js
+const express = require('express');
+const webpack = require('webpack');
+const webpackDevMiddleware = require('webpack-dev-middleware');
+const webpackHotMiddleware = require('webpack-hot-middleware');
+const webpackConfig = require('../../webpack.server.development.config.js');
+
+const compiler = webpack(webpackConfig);
+
+const app = express();
+app.use(webpackDevMiddleware(compiler, {
+  publicPath: webpackConfig.output.publicPath,
+  hot: true,
+  stats: {
+    colors: true,
+  },
+}));
+app.use(webpackHotMiddleware(compiler));
+
+app.get('/', (req, res) => {
+  const html = `
+  <html>
+    <head>
+    </head>
+    <body>
+      <div id="root"></div>
+      <script src="http://localhost:3000/app.client.bundle.js"></script>
+    </body>
+  </html>
+
+  `;
+  res.send(html);
+});
+
+app.listen(3000, () => {
+  console.log('Server running at port 3000');
+});
+```
+### 45. **Production Server**
+src/server/index.production.js
+```js
+import React from 'react';
+import ReactDOMServer from 'react-dom/server';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
+import reducers from '../client/reducers';
+import App from '../client/App';
+
+const express = require('express');
+
+const app = express();
+
+app.use(express.static('./dist/public'));
+
+function renderFullPage(html, preloadedState) {
+  return `
+    <!doctype html>
+    <html>
+      <head>
+        <title>Redux Universal Example</title>
+      </head>
+      <body>
+        <div id="root">${html}</div>
+        <script>
+          // WARNING: See the following for security issues around embedding JSON in HTML:
+          // http://redux.js.org/recipes/ServerRendering.html#security-considerations
+          window.__PRELOADED_STATE__ = ${JSON.stringify(preloadedState).replace(/</g, '\\u003c')}
+        </script>
+        <script src="./js/app.client.bundle.js"></script>
+      </body>
+    </html>
+    `;
+}
+
+function handleRequest(req, res) {
+  const store = createStore(reducers);
+  const html = ReactDOMServer.renderToString(<Provider store={store}><App /></Provider>);
+  const preloadedState = store.getState();
+  res.send(renderFullPage(html, preloadedState));
+}
+
+app.use(handleRequest);
+
+// Listen for connections (Start the server)
+app.listen(3000, () => {
+  console.log('Server running at port 3000');
+});
+```
+### 46. **Webpack Configuration**
+#### Production Client
+```js
+const path = require('path');
+
+module.exports = {
+  mode: 'production',
+  target: 'web',
+  entry: path.resolve(__dirname, './src/client/index.jsx'),
+  output: {
+    path: path.resolve(__dirname, './dist/public/js'),
+    filename: 'app.client.bundle.js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  stats: 'none',
+  resolve: {
+    extensions: ['.js', '.jsx'],
+  },
+};
+```
+#### Development Server
+```js
+const path = require('path');
+const webpack = require('webpack');
+
+module.exports = {
+  mode: 'development',
+  devtool: 'cheap-module-eval-source-map',
+  entry: [path.resolve(__dirname, './src/client/index.jsx'), 'webpack-hot-middleware/client'],
+  output: {
+    path: path.resolve(__dirname, './src/server/static'),
+    filename: 'app.client.bundle.js',
+    publicPath: '/',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.jsx$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  plugins: [new webpack.HotModuleReplacementPlugin()],
+  stats: 'none',
+  resolve: {
+    extensions: ['.js', '.jsx'],
+  },
+};
+```
+#### Production Server
+```js
+const path = require('path');
+
+module.exports = {
+  target: 'node',
+  mode: 'production',
+  entry: path.resolve(__dirname, './src/server/index.production.js'),
+  output: {
+    path: path.resolve(__dirname, './dist'),
+    filename: 'app.server.bundle.js',
+    publicPath: '/public/',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  stats: 'none',
+  resolve: {
+    extensions: ['.js', '.jsx'],
+  },
+};
+```
+### 47. NPM Scripts by Environment
+Let's add the following scripts in the package.json file:
+#### server-development
+Will run the application using the configuration done in the section _Development configurations_
+```json
+"server-development": "node ./src/server/index.development.js NODE_ENV=development",
+```
+#### server-production
+Will transpile both the Client and Server scripts, and then run the Express server.
+```json
+"server-production": "npm run client-production && webpack --config webpack.server.production.config.js && node ./dist/app.server.bundle.js",
+```
+#### client-production
+Will transpile only the Client code.
+```json
+"client-production": "webpack --config webpack.client.production.config.js"
+```
+Summarizing:
+
+![Diagram](./readme/47.npm-scripts-by-environment.png)
