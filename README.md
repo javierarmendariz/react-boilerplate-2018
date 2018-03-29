@@ -1,7 +1,15 @@
-# 35 Steps to configure a React/Redux project
+# 47 Steps to configure a React/Redux project
 The other day I was wondering about how many steps it takes to configure a React/Redux boilerplate?, So I decided to initiate the creation of this step by step guide. This is still a work in progress...
 
 This guide supposes the user has some experience with the Command Line Interface for _npm_ and _git_.
+
+- [Initial Configuration](#initial-configuration)
+- [Configuring React](#configuring-react)
+- [Configuring the Server](#configuring-the-server)
+- [Hot Module Reloading (HMR)](#hot-module-reloading-hmr)
+- [Development configurations](#development-configurations)
+- [Unit Testing](#unit-testing)
+- [Redux](#Server Side Rendering)
 
 ## Initial Configuration
 ### 1. Install in this order
