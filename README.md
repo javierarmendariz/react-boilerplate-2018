@@ -9,7 +9,8 @@ This guide supposes the user has some experience with the Command Line Interface
 - [Hot Module Reloading (HMR)](#hot-module-reloading-hmr)
 - [Development configurations](#development-configurations)
 - [Unit Testing](#unit-testing)
-- [Redux](#Server Side Rendering)
+- [Redux](#redux)
+- [Server Side Rendering](#server-side-rendering)
 
 ## Initial Configuration
 ### 1. Install in this order
